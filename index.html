@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ramen Days by Asahi 2027 · Projektdashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+:root{
+  --black:#0a0a0c;--ink:#121114;--red:#d20a11;--silver:#bdbec0;--silver-light:#e3e4e6;--silver-card:#eeeef0;
+  --silver-deep:#a9aaae;--mute:#55565a;--line:rgba(18,17,20,.16);
+  --silverg:linear-gradient(100deg,#b4b5b9 0%,#dcdddf 18%,#efeff0 34%,#c4c5c8 56%,#e2e2e4 76%,#c9cacc 100%);
+  --head:"IBM Plex Sans Condensed","Arial Narrow",sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --shadow:0 1px 2px rgba(10,10,12,.10),0 8px 22px rgba(10,10,12,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--silver-light);color:var(--ink);line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+header{background:var(--black);color:var(--silver-light);position:relative;overflow:hidden}
+header::after{content:"";position:absolute;right:-40px;top:0;bottom:0;width:200px;background:var(--red);transform:skewX(-45deg);opacity:.92;pointer-events:none}
+.head-inner{padding:48px 24px 40px;position:relative;z-index:1;max-width:1180px;margin:0 auto}
+.eyebrow{text-transform:uppercase;letter-spacing:.24em;font-size:.72rem;font-weight:600;color:var(--silver);margin-bottom:14px}
+h1{font-family:var(--head);font-weight:700;text-transform:uppercase;font-size:clamp(2.6rem,6.4vw,4.6rem);line-height:1;letter-spacing:0}
+h1 span{display:block;font-size:.34em;letter-spacing:.14em;color:var(--silver);margin-top:10px}
+.sub{margin-top:18px;font-size:1rem;max-width:560px;color:rgba(227,228,230,.82)}
+.head-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;max-width:760px}
+.chip{background:rgba(227,228,230,.10);border:1px solid rgba(227,228,230,.26);padding:7px 14px;font-size:.82rem;font-weight:500}
+.chip b{color:#fff;font-weight:700}
+.updated{margin-top:18px;font-size:.78rem;color:rgba(227,228,230,.6)}
+.refresh{display:inline-block;background:var(--red);color:#fff;border:0;height:40px;line-height:40px;padding:0 44px;font-family:var(--body);font-size:.76rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;margin-top:18px;clip-path:polygon(20px 0,100% 0,calc(100% - 20px) 100%,0 100%)}
+.refresh:hover{background:#b3080e}
+.countdown{background:var(--silverg);color:var(--ink);padding:14px 24px;text-align:center;font-weight:600;border-bottom:1px solid var(--line)}
+.countdown b{font-family:var(--head);font-size:1.35rem;font-weight:700;color:var(--red)}
+
+section{padding:52px 0 8px}
+.sec-head{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.sec-head h2{font-family:var(--head);font-weight:700;text-transform:uppercase;font-size:1.8rem;line-height:1}
+.sec-head .num{font-family:var(--head);font-weight:700;font-size:.95rem;color:#fff;background:var(--red);height:30px;line-height:30px;padding:0 20px;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);flex-shrink:0}
+
+.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-bottom:16px}
+.meter{background:var(--silver-card);border:1px solid var(--line);padding:22px;box-shadow:var(--shadow);display:flex;gap:18px;align-items:center}
+.ring{--p:0;width:80px;height:80px;border-radius:50%;flex-shrink:0;background:conic-gradient(var(--red) calc(var(--p)*1%),var(--silver) 0);display:flex;align-items:center;justify-content:center;position:relative}
+.ring::before{content:"";position:absolute;inset:8px;background:var(--silver-card);border-radius:50%}
+.ring span{position:relative;font-family:var(--head);font-weight:700;font-size:1.2rem}
+.mlabel{font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;color:var(--mute);font-weight:600}
+.mval{font-family:var(--head);font-weight:700;font-size:1.6rem;line-height:1.1;margin-top:3px}
+.mnote{font-size:.84rem;color:var(--mute);margin-top:3px}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+.kpi{background:var(--black);color:var(--silver-light);padding:22px;box-shadow:var(--shadow);border-top:4px solid var(--red)}
+.kpi .label{font-size:.76rem;text-transform:uppercase;letter-spacing:.12em;color:var(--silver);font-weight:600}
+.kpi .val{font-family:var(--head);font-weight:700;font-size:2.6rem;line-height:1;margin:10px 0 4px;color:#fff}
+.kpi .note{font-size:.84rem;color:var(--silver)}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+.stat{background:var(--silver-card);border:1px solid var(--line);padding:22px;box-shadow:var(--shadow)}
+.stat .val{font-family:var(--head);font-weight:700;font-size:2.1rem;line-height:1;color:var(--red)}
+.stat .label{font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;color:var(--mute);font-weight:600;margin-top:8px}
+.stat .src{font-size:.74rem;color:var(--mute);margin-top:6px}
+
+.months,.check-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;align-items:start}
+.card{background:var(--silver-card);border:1px solid var(--line);box-shadow:var(--shadow)}
+.card-top{padding:14px 20px;background:var(--black);color:#fff;display:flex;justify-content:space-between;align-items:center}
+.card-top h3{font-family:var(--head);font-weight:700;text-transform:uppercase;font-size:1.2rem;line-height:1.1}
+.card-top .pct{font-family:var(--head);font-weight:700;font-size:1.2rem;color:var(--silver)}
+.card-body{padding:6px 20px 14px}
+.goal{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)}
+.goal:last-child{border-bottom:none}
+.goal .box{width:20px;height:20px;border:2px solid var(--ink);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:.74rem;color:#fff;font-weight:700}
+.goal.done .box{background:var(--ink)}
+.goal.prog .box{border-color:var(--red);background:var(--red)}
+.goal .txt{font-size:.94rem}
+.goal.done .txt{color:var(--mute)}
+.tag{display:inline-block;font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;padding:2px 8px;margin-left:8px;vertical-align:middle}
+.tag.t-done{background:var(--ink);color:#fff}.tag.t-prog{background:var(--red);color:#fff}.tag.t-todo{background:var(--silver);color:var(--ink)}
+
+.gantt-scroll{overflow-x:auto;border:1px solid var(--line);background:var(--silver-card);box-shadow:var(--shadow)}
+table.gantt{border-collapse:collapse;width:100%;min-width:1040px;font-size:.84rem}
+table.gantt th,table.gantt td{border-bottom:1px solid var(--line);padding:0}
+table.gantt thead th{background:var(--black);color:var(--silver-light);font-weight:600;padding:10px 4px;font-size:.72rem;text-align:center;border-right:1px solid rgba(255,255,255,.10)}
+table.gantt thead th.evt{background:var(--red);color:#fff}
+table.gantt thead th.now{box-shadow:inset 0 -4px 0 var(--silver)}
+table.gantt thead th.t-task{text-align:left;padding-left:16px;min-width:290px}
+table.gantt thead th.t-phase{text-align:left;padding-left:14px;min-width:150px}
+td.tcell{padding:9px 16px;line-height:1.3}
+td.pcell{padding:9px 14px;font-family:var(--head);font-weight:700;text-transform:uppercase;font-size:.86rem;vertical-align:top}
+.weekcol{width:44px;text-align:center;vertical-align:middle}
+td.weekcol.evt{background:rgba(210,10,17,.08)}
+.bar-seg{height:16px;margin:0 1px}
+.ms{font-size:1rem;line-height:1;text-align:center}
+tr.alt td{background:rgba(18,17,20,.035)}
+tr.alt td.weekcol.evt{background:rgba(210,10,17,.11)}
+tr.phase-first td{border-top:2px solid var(--silver-deep)}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;align-items:center}
+.legend span{display:flex;align-items:center;gap:7px;font-size:.82rem;font-weight:500}
+.legend i{width:16px;height:16px;display:inline-block}
+
+footer{text-align:center;padding:56px 24px 48px;color:var(--mute);font-size:.82rem}
+footer b{color:var(--ink)}
+.banner{padding:14px 20px;margin:24px 0 0;font-size:.9rem;display:none}
+.banner.show{display:block}
+.banner.err{background:#f6d9da;border:1px solid var(--red);color:#7a0509}
+.banner.load{background:var(--silver-card);border:1px dashed var(--silver-deep);color:var(--mute)}
+@media(max-width:1100px){header::after{display:none}header{border-bottom:6px solid var(--red)}}
+@media(max-width:600px){.head-inner{padding:32px 20px 28px}section{padding:38px 0 6px}.kpi .val{font-size:2.1rem}}
+</style>
+</head>
+<body>
+<header>
+  <div class="head-inner">
+    <div class="eyebrow">Projektdashboard · Kitchen PR</div>
+    <h1>Ramen Days<span>by Asahi 2027</span></h1>
+    <p class="sub">Gemensam översikt för projektet. Sidan uppdateras löpande av Kitchen PR.</p>
+    <div class="head-meta">
+      <span class="chip">Genomförande <b>8 till 14 februari 2027</b></span>
+      <span class="chip"><b>Stockholm</b> och <b>Göteborg</b></span>
+      <span class="chip"><b>10</b> restauranger</span>
+    </div>
+    <div class="updated" id="updated"></div>
+    <div><button class="refresh" onclick="loadAll()">Uppdatera nu</button></div>
+  </div>
+</header>
+<div class="countdown" id="countdown"></div>
+<div class="wrap">
+  <div id="banner" class="banner"></div>
+  <section>
+    <div class="sec-head"><span class="num">01</span><h2>Översikt</h2></div>
+    <div class="meters" id="meters"></div>
+    <div class="kpis" id="kpis"></div>
+  </section>
+  <section>
+    <div class="sec-head"><span class="num">02</span><h2>Mål månad för månad</h2></div>
+    <div class="months" id="months"></div>
+  </section>
+  <section>
+    <div class="sec-head"><span class="num">03</span><h2>Avbockning</h2></div>
+    <div class="check-cols" id="checks"></div>
+  </section>
+  <section>
+    <div class="sec-head"><span class="num">04</span><h2>Tidplan</h2></div>
+    <div class="gantt-scroll"><table class="gantt" id="gantt"></table></div>
+    <div class="legend" id="legend"></div>
+  </section>
+  <section id="stats-sec">
+    <div class="sec-head"><span class="num">05</span><h2>Webbstatistik</h2></div>
+    <div class="stats-grid" id="stats"></div>
+  </section>
+  <footer>Ramen Days by Asahi 2027 · projektdashboard från <b>Kitchen PR</b></footer>
+</div>
+
+<script>
+/* =================================================================
+   KOPPLING TILL GOOGLE SHEET (Ramen_Days_Dashboard_DATA)
+   Google Sheets: Arkiv → Dela → Publicera på webben → format CSV →
+   Publicera. Klistra in länken (slutar på output=csv) här.
+   Så länge länken är tom, eller arket inte går att nå, visas
+   reservdatan i DEFAULTS nedan.
+   ================================================================= */
+const SHEET_CSV_URL = "";
+
+/* Veckor i tidplanen. Index 0 = v47 (16 nov 2026). Eventveckan är v6 (8 feb 2027). */
+const WEEKS=["v47","v48","v49","v50","v51","v52","v53","v1","v2","v3","v4","v5","v6","v7","v8"];
+const WEEK_DATES=["16/11","23/11","30/11","7/12","14/12","21/12","28/12","4/1","11/1","18/1","25/1","1/2","8/2","15/2","22/2"];
+const WEEK_START="2026-11-16";
+const EVENT_WEEK_INDEX=12;
+const MONTH_ORDER=["November","December","Januari","Februari","Mars"];
+
+/* Reservdata: samma kolumner som flikarna i arket. status = todo | prog | done */
+const C1="#0a0a0c",C2="#d20a11",C3="#6f7074",C4="#8e1d22",C5="#3a3b3f";
+const DEFAULTS={
+  installningar:[{key:"eventStart",value:"2027-02-08"},{key:"lastUpdated",value:"2026-11-23"}],
+  kpi:[
+    {label:"Veckor kvar",value:"AUTO",note:"till Ramen Days"},
+    {label:"Restauranger",value:"10",note:"5 i Stockholm, 5 i Göteborg"},
+    {label:"Filmer",value:"11",note:"1 herofilm och 10 kortfilmer"},
+    {label:"Bilder",value:"10",note:"5 per stad"}
+  ],
+  manadsmal:[
+    {month:"December",goal:"Planering",status:"todo"},
+    {month:"December",goal:"Offert och avtal",status:"todo"},
+    {month:"Januari",goal:"Foto och film",status:"todo"},
+    {month:"Januari",goal:"Kampanjstart",status:"todo"},
+    {month:"Februari",goal:"Influencerwalk",status:"todo"},
+    {month:"Februari",goal:"Ramen Days",status:"todo"}
+  ],
+  restauranger:[1,2,3,4,5].map(n=>({city:"Stockholm",restaurant:"Restaurang "+n,confirmed:"",special:""}))
+    .concat([1,2,3,4,5].map(n=>({city:"Göteborg",restaurant:"Restaurang "+n,confirmed:"",special:""}))),
+  material:[
+    {item:"Bordsryttare",status:"todo"},
+    {item:"Posters",status:"todo"},
+    {item:"Specialdesignade Ramen Days pinnar",status:"todo"},
+    {item:"Pinnar, 8-pack (Ramen Days Shop)",status:"todo"},
+    {item:"Keps (Ramen Days Shop)",status:"todo"},
+    {item:"T-shirt (Ramen Days Shop)",status:"todo"},
+    {item:"Collegetröja (Ramen Days Shop)",status:"todo"}
+  ],
+  film:[
+    {item:"Herofilm",status:"todo"},
+    {item:"5 kortfilmer Stockholm",status:"todo"},
+    {item:"5 kortfilmer Göteborg",status:"todo"},
+    {item:"5 bilder Stockholm",status:"todo"},
+    {item:"5 bilder Göteborg",status:"todo"}
+  ],
+  webbstatistik:[],
+  gantt:[
+    {phase:"Planering",color:C1,task:"Planering och koncept",start_week:0,end_week:3},
+    {phase:"Planering",color:C1,task:"Fastställa deltagande restauranger (5 per stad)",start_week:0,end_week:3},
+    {phase:"Planering",color:C1,task:"Avtal Brothboy och Dennis Yen",start_week:2,end_week:5},
+    {phase:"Produktion",color:C3,task:"Tokens och Ramen Days Shop",start_week:2,end_week:9},
+    {phase:"Produktion",color:C3,task:"Merchproduktion (pinnar, keps, t-shirt, collegetröja)",start_week:2,end_week:9},
+    {phase:"Produktion",color:C3,task:"Hemsida",start_week:2,end_week:9},
+    {phase:"Produktion",color:C3,task:"Trycksaker: bordsryttare och posters",start_week:3,end_week:10},
+    {phase:"Innehåll",color:C5,task:"Boka foto och film",start_week:2,end_week:5},
+    {phase:"Innehåll",color:C5,task:"Ramen Days Special: insamling från restaurangerna",start_week:3,end_week:8},
+    {phase:"Innehåll",color:C5,task:"Foto och film (herofilm, 10 kortfilmer, 10 bilder)",start_week:7,end_week:9},
+    {phase:"Kommunikation",color:C4,task:"Mediakit och sociala medier",start_week:8,end_week:12},
+    {phase:"Kommunikation",color:C4,task:"Pressreleaser och pressbearbetning",start_week:9,end_week:12},
+    {phase:"Kommunikation",color:C4,task:"Kampanjstart",start_week:10,end_week:10,milestone:"ja"},
+    {phase:"Kommunikation",color:C4,task:"Influencerwalk: planering och OSA",start_week:8,end_week:11},
+    {phase:"Genomförande",color:C2,task:"Leverans och bud till restaurangerna",start_week:10,end_week:11},
+    {phase:"Genomförande",color:C2,task:"Influencerwalk",start_week:11,end_week:11,milestone:"ja"},
+    {phase:"Genomförande",color:C2,task:"Eventvecka: Ramen Days",start_week:12,end_week:12},
+    {phase:"Genomförande",color:C2,task:"Utvärdering och rapport",start_week:13,end_week:14}
+  ]
+};
+
+const fmt=new Intl.DateTimeFormat('sv-SE',{day:'numeric',month:'long',year:'numeric'});
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function banner(t,m){const b=$('banner');b.className='banner show '+t;b.textContent=m;}
+function clearBanner(){$('banner').className='banner';}
+function fetchRows(url){return new Promise((res,rej)=>{Papa.parse(url,{download:true,header:false,skipEmptyLines:false,complete:r=>res(r.data),error:e=>rej(e)});});}
+/* Arket har ett avsnitt per del: en rad "# NAMN", sedan en rubrikrad, sedan datarader. */
+function parseSections(rows){
+  const out={};let name=null,head=null;
+  rows.forEach(r=>{
+    const cells=(r||[]).map(v=>(v==null?'':String(v)).trim());
+    const first=cells[0]||'';
+    if(first.startsWith('#')){name=first.replace(/^#+\s*/,'').toLowerCase();head=null;out[name]=[];return;}
+    if(!name||cells.every(v=>v===''))return;
+    if(!head){head=cells;return;}
+    const o={};head.forEach((h,i)=>{if(h)o[h]=cells[i]||'';});out[name].push(o);
+  });
+  return out;
+}
+
+async function loadAll(){
+  const d={};Object.keys(DEFAULTS).forEach(k=>d[k]=DEFAULTS[k]);
+  if(SHEET_CSV_URL){
+    try{
+      const sec=parseSections(await fetchRows(SHEET_CSV_URL));
+      if(!sec.gantt||!sec.gantt.length)throw new Error('tomt ark');
+      Object.keys(DEFAULTS).forEach(k=>{if(sec[k])d[k]=sec[k];});
+    }catch(e){console.warn('Kunde inte hämta arket, visar grunduppgifter.',e);}
+  }
+  renderAll(d);
+}
+
+function settingsToObj(rows){const o={};rows.forEach(r=>{if(r.key)o[String(r.key).trim()]=String(r.value||'').trim();});return o;}
+function placeholder(t){return `<div style="grid-column:1/-1;color:var(--mute);padding:8px 0">${t}</div>`;}
+function st(v){v=String(v||'').trim().toLowerCase();
+  if(['done','ja','klar','x'].includes(v))return 'done';
+  if(['prog','pågår','pagar'].includes(v))return 'prog';
+  return 'todo';}
+
+function renderAll(d){
+  const s=settingsToObj(d.installningar);
+  const eventStart=s.eventStart||"2027-02-08";
+  $('updated').textContent=s.lastUpdated?'Senast uppdaterad: '+fmt.format(new Date(s.lastUpdated)):'';
+  const today=new Date(),ev=new Date(eventStart);
+  const days=Math.ceil((ev-today)/864e5);const weeks=Math.max(0,Math.ceil(days/7));
+  $('countdown').innerHTML=days>0?`<b>${days}</b> dagar kvar till Ramen Days · start ${fmt.format(ev)}`
+    :(days>=-6?`Ramen Days pågår nu`:`Ramen Days 2027 är genomförd`);
+  renderMeters(d);
+  renderKpis(d.kpi,weeks);
+  renderMonths(d.manadsmal);
+  renderChecks(d);
+  renderGantt(d.gantt);
+  renderStats(d.webbstatistik);
+}
+
+function ring(done,total,label,note){
+  const pct=total?Math.round(done/total*100):0;
+  return `<div class="meter"><div class="ring" style="--p:${pct}"><span>${pct}%</span></div>
+    <div><div class="mlabel">${label}</div><div class="mval">${done} / ${total}</div>
+    <div class="mnote">${note}</div></div></div>`;
+}
+function renderMeters(d){
+  const r=d.restauranger,m=d.material;
+  $('meters').innerHTML=
+    ring(r.filter(x=>st(x.confirmed)==='done').length,r.length,'Restauranger','bekräftade')+
+    ring(r.filter(x=>st(x.special)==='done').length,r.length,'Ramen Days Special','mottagna')+
+    ring(m.filter(x=>st(x.status)==='done').length,m.length,'Trycksaker och merch','klara');
+}
+function renderKpis(rows,weeks){
+  $('kpis').innerHTML=rows.map(k=>{
+    const val=String(k.value||'').trim()==='AUTO'?weeks:esc(k.value);
+    return `<div class="kpi"><div class="label">${esc(k.label)}</div><div class="val">${val}</div><div class="note">${esc(k.note)}</div></div>`;
+  }).join('');
+}
+
+const TAG={done:'<span class="tag t-done">Klar</span>',prog:'<span class="tag t-prog">Pågår</span>',todo:'<span class="tag t-todo">Att göra</span>'};
+const MARK={done:'✓',prog:'',todo:''};
+function goalRow(text,s,tag){return `<div class="goal ${s}"><div class="box">${MARK[s]}</div><div class="txt">${esc(text)}${tag||TAG[s]}</div></div>`;}
+function card(title,right,items){return `<div class="card"><div class="card-top"><h3>${esc(title)}</h3><span class="pct">${right}</span></div><div class="card-body">${items}</div></div>`;}
+
+function renderMonths(rows){
+  const by={};rows.forEach(g=>{const m=String(g.month||'').trim();if(m)(by[m]=by[m]||[]).push(g);});
+  const names=Object.keys(by).sort((a,b)=>{const ia=MONTH_ORDER.indexOf(a),ib=MONTH_ORDER.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib);});
+  $('months').innerHTML=names.map(m=>{
+    const g=by[m];const done=g.filter(x=>st(x.status)==='done').length;const prog=g.filter(x=>st(x.status)==='prog').length;
+    const pct=Math.round((done+prog*.5)/g.length*100);
+    return card(m,pct+'%',g.map(x=>goalRow(x.goal,st(x.status))).join(''));
+  }).join('')||placeholder('Inga månadsmål ännu');
+}
+
+function renderChecks(d){
+  let html='';
+  ['Stockholm','Göteborg'].forEach(city=>{
+    const rows=d.restauranger.filter(r=>String(r.city||'').trim()===city);
+    if(!rows.length)return;
+    const done=rows.filter(r=>st(r.special)==='done').length;
+    html+=card('Ramen Days Special · '+city,done+'/'+rows.length,rows.map(r=>{
+      const s=st(r.special);
+      return goalRow(r.restaurant,s,s==='done'?'<span class="tag t-done">Mottagen</span>':'<span class="tag t-todo">Väntar</span>');
+    }).join(''));
+  });
+  [['Trycksaker och merch',d.material],['Foto och film',d.film]].forEach(([title,rows])=>{
+    if(!rows.length)return;
+    const done=rows.filter(r=>st(r.status)==='done').length;
+    html+=card(title,done+'/'+rows.length,rows.map(r=>goalRow(r.item,st(r.status))).join(''));
+  });
+  $('checks').innerHTML=html||placeholder('Ingen avbockning ännu');
+}
+
+function renderStats(rows){
+  $('stats-sec').style.display=rows.length?'':'none';
+  $('stats').innerHTML=rows.map(x=>`<div class="stat"><div class="val">${esc(x.value||'')}</div>
+    <div class="label">${esc(x.label)}</div><div class="src">${esc(x.source)}</div></div>`).join('');
+}
+
+function renderGantt(rows){
+  const W=WEEKS.length;
+  const nowIdx=Math.floor((new Date()-new Date(WEEK_START))/(7*864e5));
+  const phases=[];const pmap={};
+  rows.forEach(r=>{
+    const name=String(r.phase||'').trim();if(!name)return;
+    if(!pmap[name]){pmap[name]={name,color:String(r.color||'#0a0a0c').trim(),tasks:[]};phases.push(pmap[name]);}
+    pmap[name].tasks.push({t:r.task||'',s:parseInt(r.start_week)||0,e:parseInt(r.end_week)||0,ms:String(r.milestone||'').trim().toLowerCase()==='ja'});
+  });
+  let head=`<thead><tr><th class="t-phase">Fas</th><th class="t-task">Aktivitet</th>`;
+  WEEKS.forEach((w,i)=>{head+=`<th class="${i===EVENT_WEEK_INDEX?'evt':''} ${i===nowIdx?'now':''}">${w}<br><span style="font-weight:400;opacity:.75">${WEEK_DATES[i]}</span></th>`;});
+  head+=`</tr></thead>`;
+  let body='<tbody>',rowi=0;
+  phases.forEach(ph=>{
+    ph.tasks.forEach((tk,ti)=>{
+      let cells='';
+      for(let j=0;j<W;j++){let inner='';
+        if(j>=tk.s&&j<=tk.e)inner=tk.ms?`<div class="ms" style="color:${esc(ph.color)}">◆</div>`:`<div class="bar-seg" style="background:${esc(ph.color)}"></div>`;
+        cells+=`<td class="weekcol ${j===EVENT_WEEK_INDEX?'evt':''}">${inner}</td>`;}
+      body+=`<tr class="${rowi%2?'alt':''} ${ti===0?'phase-first':''}"><td class="pcell" style="color:${esc(ph.color)}">${ti===0?esc(ph.name):''}</td><td class="tcell">${esc(tk.t)}</td>${cells}</tr>`;
+      rowi++;
+    });
+  });
+  $('gantt').innerHTML=head+body+'</tbody>';
+  $('legend').innerHTML=phases.map(p=>`<span><i style="background:${esc(p.color)}"></i>${esc(p.name)}</span>`).join('')
+    +`<span style="margin-left:auto;color:var(--mute)">◆ = milstolpe · röd kolumn = eventveckan</span>`;
+}
+
+loadAll();
+</script>
+</body>
+</html>
