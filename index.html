@@ -329,7 +329,7 @@ function renderChecks(d){
     const rows=d.restauranger.filter(r=>String(r.city||'').trim()===city);
     if(!rows.length)return;
     const done=rows.filter(r=>st(r.special)==='done').length;
-    html+=card('Ramen Days Special · '+city,done+'/'+rows.length,rows.map(r=>{
+    html+=card('Meny Ramen Days Special · '+city,done+'/'+rows.length,rows.map(r=>{
       const s=st(r.special);
       return goalRow(r.restaurant,s,s==='done'?'<span class="tag t-done">Mottagen</span>':'<span class="tag t-todo">Väntar</span>');
     }).join(''));
