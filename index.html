@@ -107,6 +107,9 @@ footer b{color:var(--ink)}
 .banner.show{display:block}
 .banner.err{background:#f6d9da;border:1px solid var(--red);color:#7a0509}
 .banner.load{background:var(--silver-card);border:1px dashed var(--silver-deep);color:var(--mute)}
+#checks{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:980px){#checks{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){#checks{grid-template-columns:1fr}}
 @media(max-width:1100px){header::after{display:none}header{border-bottom:6px solid var(--red)}}
 @media(max-width:600px){.head-inner{padding:32px 20px 28px}section{padding:38px 0 6px}.kpi .val{font-size:2.1rem}}
 </style>
@@ -194,12 +197,12 @@ const DEFAULTS={
   material:[
     {item:"Bordsryttare",status:"todo"},
     {item:"Posters",status:"todo"},
+    {item:"Gyllene skålar",status:"todo"},
     {item:"Specialdesignade Ramen Days pinnar",status:"todo"},
     {item:"Pinnar, 8-pack (Ramen Days Shop)",status:"todo"},
-    {item:"Keps (Ramen Days Shop)",status:"todo"},
-    {item:"T-shirt (Ramen Days Shop)",status:"todo"},
-    {item:"Collegetröja (Ramen Days Shop)",status:"todo"}
+    {item:"Kläder: keps, t-shirt och collegetröja (Ramen Days Shop, ordnas av Asahi)",status:"todo"}
   ],
+  influencerwalk:["Stockholm","Göteborg"].flatMap(c=>[1,2,3,4,5,6,7,8,9,10].map(n=>({city:c,guest:"Deltagare "+String(n).padStart(2,"0"),status:"todo"}))),
   film:[
     {item:"Herofilm",status:"todo"},
     {item:"5 kortfilmer Stockholm",status:"todo"},
@@ -212,8 +215,9 @@ const DEFAULTS={
     {phase:"Planering",color:C1,task:"Planering och koncept",start_week:0,end_week:3},
     {phase:"Planering",color:C1,task:"Fastställa deltagande restauranger (5 per stad)",start_week:0,end_week:3},
     {phase:"Planering",color:C1,task:"Avtal Brothboy och Dennis Yen",start_week:2,end_week:5},
-    {phase:"Produktion",color:C3,task:"Tokens och Ramen Days Shop",start_week:2,end_week:9},
-    {phase:"Produktion",color:C3,task:"Merchproduktion (pinnar, keps, t-shirt, collegetröja)",start_week:2,end_week:9},
+    {phase:"Produktion",color:C3,task:"Digitalt flöde: tokens, kvitto och Ramen Days Shop",start_week:2,end_week:9},
+    {phase:"Produktion",color:C3,task:"Merchproduktion: pinnar (Asahi ordnar kläderna)",start_week:2,end_week:9},
+    {phase:"Produktion",color:C3,task:"Ta fram gyllene skålar",start_week:2,end_week:9},
     {phase:"Produktion",color:C3,task:"Hemsida",start_week:2,end_week:9},
     {phase:"Produktion",color:C3,task:"Trycksaker: bordsryttare och posters",start_week:3,end_week:10},
     {phase:"Innehåll",color:C5,task:"Boka foto och film",start_week:2,end_week:5},
@@ -331,11 +335,20 @@ function renderChecks(d){
       return goalRow(r.restaurant,s,s==='done'?'<span class="tag t-done">Mottagen</span>':'<span class="tag t-todo">Väntar</span>');
     }).join(''));
   });
-  [['Trycksaker och merch',d.material],['Foto och film',d.film]].forEach(([title,rows])=>{
+  const list=(title,rows)=>{
     if(!rows.length)return;
     const done=rows.filter(r=>st(r.status)==='done').length;
     html+=card(title,done+'/'+rows.length,rows.map(r=>goalRow(r.item,st(r.status))).join(''));
+  };
+  list('Trycksaker och merch',d.material);
+  const WTAG={done:'<span class="tag t-done">Tackat ja</span>',prog:'<span class="tag t-prog">Inbjuden</span>',todo:'<span class="tag t-todo">Att bjuda in</span>'};
+  ['Stockholm','Göteborg'].forEach(city=>{
+    const rows=(d.influencerwalk||[]).filter(r=>String(r.city||'').trim()===city);
+    if(!rows.length)return;
+    const done=rows.filter(r=>st(r.status)==='done').length;
+    html+=card('Influencerwalk · '+city,done+'/'+rows.length,rows.map(r=>{const s=st(r.status);return goalRow(r.guest,s,WTAG[s]);}).join(''));
   });
+  list('Foto och film',d.film);
   $('checks').innerHTML=html||placeholder('Ingen avbockning ännu');
 }
 
